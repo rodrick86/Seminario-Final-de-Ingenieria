@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block content %}
+<h2>{% if form.instance.pk %}Editar{% else %}Crear{% endif %} Cliente</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn btn-outline-secondary" value="Guardar">
+</form>
+<a href="{% url 'lista_clientes' %}" class="btn btn-primary btn-sm">Volver a la lista de clientes</a>
+
+{% endblock %}

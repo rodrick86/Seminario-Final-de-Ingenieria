@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{%load static%}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+{% block content %}
+
+
+
+
+
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="tecnico">Seleccionar Técnico:</label>
+        <select name="tecnico" id="tecnico" class="form-control" onchange="this.form.submit()">
+            <option value="">-- Selecciona un Técnico --</option>
+            {% for tecnico in tecnicos %}
+                <option value="{{ tecnico.id }}" {% if tecnico_seleccionado and tecnico.id == tecnico_seleccionado.id %}selected{% endif %}>{{ tecnico.user.username }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</form>
+
+{% if tecnico_seleccionado %}
+    <h2>Órdenes asignadas a {{ tecnico_seleccionado.user.username }}</h2>
+    <div class="table-responsive">
+        <table class="table align-items-center table-flush">
+            <thead class="thead-light">
+                <tr>
+                    <th scope="col">Vehiculo</th>
+                    <th scope="col">Entrega</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Tiempo</th>
+                    <th scope="col">Progress</th>
+                    <th scope="col" class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes_asignadas %}
+                    <tr>
+                        <td>{{ orden }}</td>
+                        <td>{{ orden.entrega }}</td>
+                        <td>{{ orden.estado }}</td>
+                        <td>{{orden.tiempo_total}}</td>
+                        <td>{{ orden.progress }}</td>
+                        <td>{{orden.tiempo_total}}</td>
+                        <td class="text-right">
+                            <!-- Acciones relacionadas con la orden -->
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
+
+<a href="{% url 'index' %}" class="btn btn-primary">&#x1F860; Volver</a>
+
+ {% endblock content %}
+
+
+
+
+

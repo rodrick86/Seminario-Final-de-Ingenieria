@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block extrastyle %}
+<style>
+    .card-block {
+        overflow-wrap: break-word;
+    }
+</style>
+{% endblock extrastyle %}
+
+{% block wrapper %}
+  {% block sidebar %}{% endblock sidebar %}
+
+  {% block header %}
+<div class="card Recent-Users">
+    <div class="card-header">
+        <div class="page-wrapper">
+            {% block main_content %}
+                <div class="container">
+                    <div class="col-md-12 col-xl-4 mx-auto">
+                        <div class="card yearly-sales">
+                            <div class="card-block text-center">
+                                <h1 class="display-6 mt-4 mb-4">Presupuesto Aprobado Exitosamente</h1>
+                                <p class="lead mb-4">¡Felicidades! El presupuesto ha sido aprobado correctamente.</p>
+                                <p class="mb-4">Detalles del Presupuesto:</p>
+                                <ul>
+                                    <li>Presupuesto ID: {{ presupuesto.id }}</li>
+                                    <li>Orden ID: {{ presupuesto.orden.id }}</li>
+                                    <!-- Agrega más detalles según tu modelo de datos -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endblock main_content %}
+        </div>
+    </div>
+</div>
+{% endblock header %}
+
+  <!-- [ Main Content ] start -->
+  <div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+      <div class="pcoded-content">
+
+        <!-- [ breadcrumb ] start -->
+        {% block breadcrumbs %}
+
+          {% include 'includes/breadcrumb.html' %}
+
+        {% endblock breadcrumbs %}
+        <!-- [ breadcrumb ] end -->
+
+
+{% endblock wrapper %}

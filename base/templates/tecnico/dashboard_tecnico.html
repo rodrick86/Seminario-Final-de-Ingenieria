@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% load ordenes_asignadas_tags %}
+
+
+
+{%load static%}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+
+
+
+{% block content %}
+
+
+
+
+
+
+
+<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+<body>
+  <div class="main-content">
+    <div class="container mt-7">
+      <!-- Table -->
+
+
+          <div class="col">
+            <div class="card shadow">
+              <div class="card-header border-0">
+                <h3 class="mb-0">Ordenes de : {{ request.user.username|title }}</h3>
+              </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">Vehiculo</th>
+                    <th scope="col">Ingreso</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Users</th>
+                    <th scope="col">Completion</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+               {% if ordenes_asignadas %}
+                {% for orden in ordenes_asignadas %}
+                  <tr>
+                    <th scope="row">
+                      <div class="media align-items-center">
+                        <a href="#" class="avatar rounded-circle mr-3">
+                          <img alt="Image placeholder" src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/bootstrap.jpg">
+                        </a>
+
+                        <div class="media-body">
+
+                          <h6 class="m-0">{{orden.auto}}</h6>
+                           <a>{{orden.auto.vehiculo}}</a>
+
+
+                        </div>
+
+                      </div>
+                    </th>
+                    <td>
+                      {{ orden.fecha_creacion|date:"d-m-Y H:i" }}
+                    </td>
+                    <td>
+                      <span class="badge badge-dot mr-4">
+                        {% if orden.estado == 'pendiente' %}
+                  <div class="d-flex align-items-center">
+                        <span class="mr-2">72%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-danger" role="progressbar" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100" style="width: 72%;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    <span class="badge badge-dot mr-4">
+                        <i class="bg-warning"></i> {{orden.estado}}
+
+                      </span>
+
+                   {% elif orden.estado == 'asignado' %}
+                    <span class="bg badge-dot">
+                        <i class="bg-info"></i> {{orden.estado}}
+                      </span>
+
+
+                  {% elif orden.estado == 'finalizado' %}
+                    <span class="bg badge-dot mr-4">
+                        <i class="bg-success"></i> {{orden.estado}}
+                      </span>
+
+                  {% elif orden.estado == 'aprobado' %}
+                    <h6 class="bg badge-danger">{{orden.estado}}</h6>
+
+                  {% elif orden.estado == 'presupuestado' %}
+                    <span class="bg badge-dot">
+                        <i class="bg-info"></i> {{orden.estado}}
+                      </span>
+
+                  {% elif orden.estado == 'en proceso' %}
+                    <span class="bg badge-dot">
+                        <i class="bg-info"></i> {{orden.estado}}
+                      </span>
+
+
+
+                  {% endif %}
+                      </span>
+                    </td>
+                    <td>
+                      <div class="avatar-group">
+                        <a href="#" class="avatar avatar-sm" data-toggle="tooltip" data-original-title="{{orden.tecnico}}">
+                          <img alt="Image placeholder" src="https://raw.githack.com/creativetimofficial/argon-dashboard/master/assets/img/theme/team-1-800x800.jpg" class="rounded-circle">
+                        </a>
+
+                      </div>
+                    </td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <span class="mr-2">60%</span>
+                        <div>
+                          <div class="progress">
+                            <div class="progress-bar bg-warning" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 60%;"></div>
+                          </div>
+
+                        </div>
+                      </div>
+                      <div>
+                        <div>
+                            <span class="mr-2" id="progress-percent">0%</span>
+                            <div class="progress">
+                                <div id="progress-bar" class="progress-bar bg-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    </td>
+                    <td class="text-right">
+                      <div class="dropdown">
+                        <a class="btn btn-sm btn-icon-only text-light" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <i class="fas fa-ellipsis-v"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                          <a class="dropdown-item" href="#">Action</a>
+                          <a class="dropdown-item" href="#">Another action</a>
+                          <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                    {% endfor %}
+
+               {% else %}
+    <p>No tienes órdenes asignadas en este momento.</p>
+  {% endif %}
+    </ul>
+
+
+
+                </tbody>
+              </table>
+            </div>
+            <div class="card-footer py-4">
+              <nav aria-label="...">
+                <ul class="pagination justify-content-end mb-0">
+                  <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">
+                      <i class="fas fa-angle-left"></i>
+                      <span class="sr-only">Previous</span>
+                    </a>
+                  </li>
+                  <li class="page-item active">
+                    <a class="page-link" href="#">1</a>
+                  </li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">2 <span class="sr-only">(current)</span></a>
+                  </li>
+                  <li class="page-item"><a class="page-link" href="#">3</a></li>
+                  <li class="page-item">
+                    <a class="page-link" href="#">
+                      <i class="fas fa-angle-right"></i>
+                      <span class="sr-only">Next</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+{% if error_message %}
+    <div class="alert alert-danger" role="alert">
+        {{ error_message }}
+    </div>
+{% endif %}
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    function obtenerColorBarra(porcentaje) {
+        if (porcentaje <= 25) return 'bg-danger';
+        else if (porcentaje <= 50) return 'bg-warning';
+        else if (porcentaje <= 75) return 'bg-info';
+        else return 'bg-success';
+    }
+
+    function actualizarBarraProgreso(ordenId, porcentaje) {
+        const barra = document.getElementById('progress-bar-' + ordenId);
+        const percentElem = document.getElementById('progress-percent-' + ordenId);
+        if (barra && percentElem) {
+            barra.style.width = porcentaje + '%';
+            barra.setAttribute('aria-valuenow', porcentaje);
+            percentElem.textContent = porcentaje.toFixed(0) + '%';
+            barra.className = 'progress-bar ' + obtenerColorBarra(porcentaje);
+        }
+    }
+
+    function actualizarEstadoItems(ordenId) {
+        fetch(`/get_estado_orden/${ordenId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarBarraProgreso(ordenId, data.progreso);
+                } else {
+                    console.error('Error al obtener el estado de los ítems:', data.error);
+                }
+            })
+            .catch(error => console.error('Error al obtener el estado de los ítems:', error));
+    }
+
+    // Inicializar las barras de progreso para todas las órdenes
+    document.querySelectorAll('[id^="progress-bar-"]').forEach(barra => {
+        const ordenId = barra.id.split('-').pop();
+        actualizarEstadoItems(ordenId);
+    });
+});
+</script>
+
+ {% if ordenes_asignadas %}
+
+    <ul>
+      {% for orden in ordenes_asignadas %}
+        <li>
+          <strong>ID de Orden:</strong>  <br>
+          <strong>Descripción:</strong> {{ orden.descripcion }} <br>
+          <strong>Estado:</strong> {{ orden.estado }} <br>
+          <strong>Fecha de Creación:</strong> {{ orden.fecha_creacion|date:"d-m-Y H:i" }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No tienes órdenes asignadas en este momento.</p>
+  {% endif %}
+{% endblock %}

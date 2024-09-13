@@ -1,0 +1,404 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block content %}
+
+    <div class="col-sm-12">
+    <div class="card">
+        <div class="card-header">
+            <h5>ORDEN DE REPARACIÓN VEHÍCULO {{ orden.vehiculo }} {{ orden }} </h5>
+            <h6>ID: {{ orden.id }} </h6>
+            <h6>Tecnico asigando: {{ orden.tecnico}} </h6>
+            <p >Hora de inicio: {{ orden.hora_inicio }}</p>
+          <p id="tiempo-total">Tiempo empleado en vehículo: {{ orden.tiempo_total|format_timedelta }}</p>
+
+            <p class="text-center"><span id="reloj" class="badge bg-outline-secondary">00:00:00</span></p>
+
+
+
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Información de la Orden</h4>
+                    <p>Recepcionista: {{ orden.usuario }}</p>
+                    <p>Fecha de Ingreso: {{ orden.fecha_creacion|date:"F j, Y, P" }}</p>
+
+                    <p>Entrega: {{ orden.entrega }}</p>
+                    <p>KM: {{ orden.km }}</p>
+                    <p>Entrega: {{ orden.entrega }}</p>
+
+                    <form id="temporizador-form">
+                        {% csrf_token %}
+                        <button class="fas fa-play-circle" style="font-size: 32px; border: none; background: white;" type="button" id="iniciar"></button>
+                        <button class="fas fa-pause-circle" style="font-size: 32px; color: #fed300; border: none; background: white;" type="button" id="pausar"></button>
+                        <button class="fas fa-stop-circle" style="font-size: 32px; color: red; border: none; background: white;" type="button" id="detener"></button>
+                        <button class="fas fa-check-circle" style="font-size: 32px; color: green; border: none; background: white;" type="button" id="finalizar"></button>
+                    </form>
+
+                    <br>
+
+                    <div>
+                        <div>
+                            <span class="mr-2" id="progress-percent">0%</span>
+                            <div class="progress">
+                                <div id="progress-bar" class="progress-bar bg-danger" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <h2>Detalles del Auto</h2>
+
+
+                </div>
+
+
+                        <div class="col-sm-12 col-md-4 mt-3">
+
+            <div id="autoInfo">
+                <h4>Información del Auto</h4>
+                <p>Chasis: <span>{{orden.auto.chasis}}</span></p>
+                <p>Modelo: <span>{{orden.auto.vehiculo}}</span></p>
+                <p>Año: <span>{{orden.auto.anio}}</span></p>
+                <p>Matrícula: <span>{{orden.auto.matricula}}</span></p>
+            </div>
+            <div id="clienteInfo" class="mt-3">
+                <h4>Información del Cliente</h4>
+                <p>Titular: <span>{{orden.auto.cliente}}</span></p>
+
+                <p>CUIT/CUIL: <span >{{orden.auto.cliente.cuil}}</span></p>
+                <p>Dirección: <span >{{orden.auto.cliente.direccion}}</span></p>
+                <p>Teléfono: <span >{{orden.auto.cliente.telefono}}</span></p>
+                <p>Email: <span >{{orden.auto.cliente.email}}</span></p>
+            </div>
+
+                    <a href="{% url 'crear-presupuesto' orden_id=orden.id %}" class="btn btn-outline-primary">Generar Presupuesto</a>
+
+                    <br><br>
+
+                    <button type="button" class="btn btn-outline-primary" id="togglePresupuestosBtn">Mostrar Presupuestos</button>
+
+                    <div id="presupuestosTableWrapper" style="display: none;">
+                        {% if presupuestos %}
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Detalle</th>
+                                        <th>Estado</th>
+                                        <th>Ver</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for presupuesto_item in presupuestos %}
+                                        <tr>
+                                            <td>{{ presupuesto_item.fecha_creacion|date:"F j, Y, P" }}</td>
+                                            <td>{{ presupuesto_item.detalle }}</td>
+                                            <td>{{ presupuesto_item.estado_presupuesto }}</td>
+                                            <td> <a href="{% url 'visualizar_presupuesto' presupuesto_item.id %}" class="text-secondary mr-2" title="Ver presupuesto">
+                                    <i class="feather icon-search"></i>
+                                </a></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No hay presupuesto asociado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <h4>Ítems Solicitados</h4>
+                    {% if items_solicitados %}
+                        <ul id="items-list">
+                            {% for item in items_solicitados %}
+                                <li>
+                                    <input type="checkbox" class="item-checkbox" data-item-id="{{ item.id }}" {% if item.realizado %}checked{% endif %}>
+                                    {{ item.descripcion }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No hay ítems solicitados para esta orden.</p>
+                    {% endif %}
+                </div>
+
+                <div class="col-md-12">
+                 <div class="accordion" id="accordionExample">
+                        <div class="card">
+                            <div class="card-header" id="headingOne">
+                                <button class="btn btn-outline-secondary" type="button" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Intervencion
+                                </button>
+                            </div>
+
+                            <div id="collapseOne" class="collapse hide" aria-labelledby="headingOne" data-parent="#accordionExample">
+                                <div class="card-body">
+                                    <label for="intervencion">Aqui:</label>
+                                    <textarea id="intervencion" name="intervencion" rows="4" cols="50" style="width: 100%; resize: both;">{{ orden.intervencion|default_if_none:"" }}
+                                    </textarea>
+                                    <button type="button" id="guardarIntervencionBtn" class="btn btn-outline-primary">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <a href="{% url 'index' %}" class="btn btn-primary">&#x1F860; Volver</a>
+</div>
+
+
+
+
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="myModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Guardado!</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <p>Cambios Guardados Exitosamente </p>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let relojInterval;
+    let tiempoInicio;
+    let tiempoTranscurrido = 0;
+    let ordenFinalizada = false;  // Variable para verificar si la orden ya ha sido finalizada
+    let temporizadorIniciado = false;  // Variable para verificar si el temporizador está iniciado
+
+    function formatearTiempo(segundos) {
+        const horas = String(Math.floor(segundos / 3600)).padStart(2, '0');
+        const minutos = String(Math.floor((segundos % 3600) / 60)).padStart(2, '0');
+        const segs = String(segundos % 60).padStart(2, '0');
+        return `${horas}:${minutos}:${segs}`;
+    }
+
+    function actualizarReloj() {
+        const relojElem = document.getElementById('reloj');
+        if (relojElem) {
+            relojElem.textContent = 'Tiempo transcurrido: ' + formatearTiempo(tiempoTranscurrido);
+        }
+    }
+
+    function actualizarTiempoTotal() {
+        fetch('{% url "get_tiempo_total" orden.id %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const tiempoTotal = data.tiempo_total || '00:00:00';
+                    document.getElementById('tiempo-total').textContent = 'Tiempo total: ' + tiempoTotal;
+                } else {
+                    console.error('Error al obtener el tiempo total:', data.error);
+                }
+            })
+            .catch(error => console.error('Error al obtener el tiempo total:', error));
+    }
+
+    function manejarTemporizador(accion) {
+        fetch('{% url "manejar_orden" orden.id %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: new URLSearchParams({ 'accion': accion })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                switch (accion) {
+                    case 'iniciar':
+                        tiempoInicio = Date.now();
+                        temporizadorIniciado = true;  // Marcar que el temporizador ha sido iniciado
+                        ordenFinalizada = false;  // Permitir finalizar nuevamente si se inicia de nuevo
+                        if (!relojInterval) {
+                            relojInterval = setInterval(() => {
+                                tiempoTranscurrido = Math.floor((Date.now() - tiempoInicio) / 1000);
+                                actualizarReloj();
+                                actualizarTiempoTotal();
+                            }, 1000);
+                        }
+                        break;
+                    case 'pausar':
+                    case 'detener':
+                        clearInterval(relojInterval);
+                        relojInterval = null;
+                        tiempoTranscurrido = (accion === 'detener') ? 0 : tiempoTranscurrido;
+                        actualizarReloj();
+                        actualizarTiempoTotal();
+                        temporizadorIniciado = false;  // Marcar que el temporizador ya no está activo
+                        break;
+                    case 'finalizar':
+                        clearInterval(relojInterval);
+                        relojInterval = null;
+                        tiempoTranscurrido = 0;
+                        actualizarReloj();
+                        actualizarTiempoTotal();
+                        ordenFinalizada = true;  // Marcar la orden como finalizada
+                        temporizadorIniciado = false;  // Marcar que el temporizador ya no está activo
+                        alert('Orden finalizada correctamente.');
+                        break;
+                }
+            } else {
+                alert('Error al manejar el temporizador: ' + data.error);
+            }
+        })
+        .catch(error => console.error('Error al manejar el temporizador:', error));
+    }
+
+    function obtenerColorBarra(porcentaje) {
+        if (porcentaje <= 25) return 'bg-danger'; // Rojo para menos del 25%
+        else if (porcentaje <= 50) return 'bg-warning'; // Amarillo para 25% a 50%
+        else if (porcentaje <= 75) return 'bg-info'; // Azul claro para 50% a 75%
+        else return 'bg-success'; // Verde para más del 75%
+    }
+
+    function actualizarBarraProgreso(porcentaje) {
+        const barra = document.getElementById('progress-bar');
+        const percentElem = document.getElementById('progress-percent');
+        if (barra && percentElem) {
+            barra.style.width = porcentaje + '%';
+            barra.setAttribute('aria-valuenow', porcentaje);
+            percentElem.textContent = porcentaje.toFixed(0) + '%';
+
+            // Cambiar el color de la barra
+            barra.className = 'progress-bar ' + obtenerColorBarra(porcentaje);
+        }
+    }
+
+    function actualizarEstadoItems() {
+        fetch('{% url "obtener_estado_orden" orden.id %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarBarraProgreso(data.progreso);
+                } else {
+                    console.error('Error al obtener el estado de los ítems:', data.error);
+                }
+            })
+            .catch(error => console.error('Error al obtener el estado de los ítems:', error));
+    }
+
+    document.getElementById('iniciar').addEventListener('click', () => manejarTemporizador('iniciar'));
+    document.getElementById('pausar').addEventListener('click', () => manejarTemporizador('pausar'));
+    document.getElementById('detener').addEventListener('click', () => manejarTemporizador('detener'));
+    document.getElementById('finalizar').addEventListener('click', () => {
+        if (ordenFinalizada && !temporizadorIniciado) {
+            alert('La orden ya ha sido finalizada anteriormente.');
+        } else if (confirm('¿Estás seguro que deseas finalizar la orden?')) {
+            manejarTemporizador('finalizar');
+        }
+    });
+
+    document.getElementById('togglePresupuestosBtn').addEventListener('click', () => {
+        const tableWrapper = document.getElementById('presupuestosTableWrapper');
+        if (tableWrapper) {
+            tableWrapper.style.display = tableWrapper.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+
+    document.querySelectorAll('.item-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            const itemId = checkbox.getAttribute('data-item-id');
+            const realizado = checkbox.checked;
+
+            fetch('{% url "actualizar_item" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: new URLSearchParams({
+                    'item_id': itemId,
+                    'realizado': realizado
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    actualizarBarraProgreso(data.porcentaje);
+                } else {
+                    alert('Error al actualizar el ítem.');
+                }
+            })
+            .catch(error => console.error('Error al actualizar el ítem:', error));
+        });
+    });
+    // Save the edited intervention content when the button is clicked
+        $("#guardarIntervencionBtn").click(function () {
+            // Get the updated intervention content from the textarea
+            var updatedIntervencionText = $("#intervencion").val();
+
+            // Update the displayed intervention content
+            $("p:contains('Intervencion: ')").text("Intervencion: " + updatedIntervencionText);
+
+            // Send the updated content to the server for saving
+            $.ajax({
+                type: "POST",
+                url: "/save_intervencion/",  // Update the URL to your server-side endpoint
+                data: {
+                    intervencion: updatedIntervencionText,
+                    orden_id: {{ orden.id }},
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function (data) {
+                    // Optional: You can handle success response from the server if needed
+                    console.log("Data saved successfully:", data);
+                },
+                error: function (error) {
+                    // Optional: You can handle error response from the server if needed
+                    console.log("Error saving data:", error);
+                }
+            });
+
+            // Show a modal instead of an alert
+            $("#myModal").modal("show");
+        });
+    // Inicializar barra de progreso al cargar la página
+    actualizarEstadoItems();
+});
+</script>
+
+
+
+<style>
+.bg-danger {
+    background-color: #dc3545;
+}
+
+.bg-warning {
+    background-color: #ffc107;
+}
+
+.bg-info {
+    background-color: #17a2b8;
+}
+
+.bg-success {
+    background-color: #28a745;
+}
+</style>
+
+{% endblock %}

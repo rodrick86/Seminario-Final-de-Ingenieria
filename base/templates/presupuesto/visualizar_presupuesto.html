@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Presupuesto para Orden #{{ presupuesto.orden.id }}</h1>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Detalles del Presupuesto</h5>
+            <p><strong>ID del Presupuesto:</strong> {{ presupuesto.id }}</p>
+            <p><strong>Cliente:</strong> {{ presupuesto.orden.auto.cliente.nombre }}</p>
+            <p><strong>Detalle:</strong> {{ presupuesto.detalle }}</p>
+            <p><strong>Precio:</strong> {{ presupuesto.precio }}</p>
+            <p><strong>Estado del Presupuesto:</strong> {{ presupuesto.estado_presupuesto }}</p>
+
+            <a href="{% url 'index' %}" class="btn btn-secondary">&#x1F860; Volver</a>
+        </div>
+    </div>
+{% endblock %}

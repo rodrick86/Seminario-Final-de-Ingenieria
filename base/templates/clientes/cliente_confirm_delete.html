@@ -1,0 +1,18 @@
+
+
+{% endblock %}
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center d-flex flex-column align-items-center">
+  <h3>Eliminar Cliente</h3>
+
+  <p>¿Está seguro que desea eliminar el Cliente "{{ object.nombre }}"?</p>
+
+  <form method="post" class="d-flex">
+     {% csrf_token %}
+    <button type="submit" class="btn btn-outline-secondary">Eliminar</button>
+    <a href="{% url 'lista_clientes' %}" class="btn btn-outline-secondary ml-2">Cancelar</a>
+  </form>
+</div>
+{% endblock %}

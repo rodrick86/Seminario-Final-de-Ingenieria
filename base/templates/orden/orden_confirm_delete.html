@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{%load static%}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+
+
+
+
+{% block content %}
+
+<div class="row">
+    <a href="{% url 'index' %}">&#x1F860; Volver</a>
+</div>
+
+<div class="cuerpo-tarjeta">
+    <form method="POST">
+    {% csrf_token %}
+    <p>Vas a eliminar esta tarea: "{{orden}}"</p>
+    <input class='boton' type="submit" value="Eliminar">
+</form>
+</div>
+
+{% endblock content %}

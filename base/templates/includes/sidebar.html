@@ -1,0 +1,234 @@
+{% load static %}
+
+<nav class="pcoded-navbar">
+  <div class="navbar-wrapper">
+    <div class="navbar-brand header-logo">
+
+           <span class="b-title">Post Venta </span>
+
+
+        <ul>
+
+        </ul>
+        <div>
+
+
+        </div>
+
+
+
+      </a>
+      <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+    </div>
+    <div class="navbar-content scroll-div">
+      <ul class="nav pcoded-inner-navbar">
+        <li class="nav-item pcoded-menu-caption">
+          <label>Cuentas</label>
+        </li>
+          {% if user.is_superuser %}
+          <li data-username="" class="nav-item {% if 'index' in segment %}active{% endif %}">
+
+          <a href="{% url 'admin:index' %}" class="nav-link ">
+
+            <span class="pcoded-micon"><i class="feather icon-home"></i></span><span class="pcoded-mtext">Admin</span>
+          </a>
+        </li>
+
+
+           {% endif %}
+
+        <li
+         class="nav-item pcoded-hasmenu">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-lock"></i></span><span class="pcoded-mtext">Usuarios</span></a>
+           <ul class="pcoded-submenu">
+           <li class="nav-item" id="logout-link">
+            <a href="#" class="nav-link" onclick="logout()">
+            <span class="pcoded-micon"><i class="fas fa-power-off"></i></span>
+           <span class="pcoded-mtext">Cerrar Sesión</span>
+            </a>
+
+              </li>
+             </ul>
+
+            <ul class="pcoded-submenu">
+              <li class="nav-item ">
+              <a class="nav-link" href="{% url 'password_change' %}">Cambio Password</a>
+            </ul>
+
+             <ul class="pcoded-submenu">
+              <li class="nav-item ">
+              {% if user.planificador or user.is_superuser %}
+              <a class="nav-link" href="{% url 'register' %}">Crear Nuevo Usuario</a>
+                 {% else %}
+
+
+              {% endif %}
+
+
+          </ul>
+          </li>
+
+
+         <li class="nav-item pcoded-menu-caption">
+
+          <label>Negocio</label>
+        </li>
+
+      <!-- GESTION -->
+
+
+        </li>
+        <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-file-minus"></i></span><span class="pcoded-mtext">Ordenes</span></a>
+          <ul class="pcoded-submenu">
+              <li class="nav-item ">
+              <a id='enlace-agregar' href="{% url 'crear-orden' %}" > Crear nueva orden </a>
+              </li>
+              <li class="nav-item ">
+                <a href="{% url 'ordenes_entregadas' %}">Ordenes entergadas</a>
+              </li>
+          </ul>
+        </li>
+
+        <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Presupuesto</span></a>
+          <ul class="pcoded-submenu">
+               <li class="nav-item ">
+                   <a href="{% url 'listar_presupuestos' %}">Ver presupuestos</a>
+
+                </li>
+
+          </ul>
+
+        </li>
+
+        <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-users"></i></span><span class="pcoded-mtext">Tecnicos</span></a>
+          <ul class="pcoded-submenu">
+               <li class="nav-item ">
+
+
+                </li>
+              <li>
+                  <a >Editar Técnico</a>
+              </li>
+              <li>
+                  <a href="{% url 'buscar_tecnico' %}">Buscar Tenicos </a>
+              </li>
+          </ul>
+        </li>
+
+
+
+
+
+
+        <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="fas fa-users"></i></span><span class="pcoded-mtext">Clientes</span></a>
+          <ul class="pcoded-submenu">
+                <a class="nav-link" href="{% url 'lista_clientes' %}">Listado clientes</a>
+            <a class="nav-link" href="{% url 'crear_cliente' %}">Crear nuevo cliente</a>
+
+          </ul>
+        </li>
+
+          </li>
+
+               <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-trending-up"></i></span><span class="pcoded-mtext">Vehiculo</span></a>
+          <ul class="pcoded-submenu">
+               <li class="nav-item ">
+
+                </li>
+              <li>
+                  <a href="{% url 'crear_auto' %}">Crear nuevo vehiculo</a>
+              </li>
+              <li>
+
+              </li>
+          </ul>
+        </li>
+
+          <li
+          class="nav-item pcoded-hasmenu ">
+              {% if user.planificador or user.is_superuser %}
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-clock"></i></span><span class="pcoded-mtext">Planificador</span></a>
+
+          <ul class="pcoded-submenu">
+               <li class="nav-item ">
+               <a href="{% url 'planificacion' %}">Ir a Planificación</a>
+
+                </li>
+              <li>
+
+
+              </li>
+          </ul>
+
+              {% endif %}
+        </li>
+
+             <li
+          class="nav-item pcoded-hasmenu ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon">
+            <i class="feather icon-trending-up"></i></span><span class="pcoded-mtext">Metricas</span></a>
+          <ul class="pcoded-submenu">
+               <li class="nav-item ">
+
+                </li>
+              <li>
+                  <a href="{% url 'establecer_objetivo' %}" >Establecer Objetivo Mensual</a>
+              </li>
+              <li>
+                  <a href="{% url 'metricas' %}">Ir a metricas</a>
+              </li>
+          </ul>
+        </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+</nav>
+
+<script>
+  function logout() {
+    // Crear un formulario oculto
+    var form = document.createElement('form');
+    form.method = 'post';
+    form.action = "{% url 'logout' %}";
+
+    // Agregar el token CSRF al formulario
+    var csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+    form.appendChild(csrfInput);
+
+    // Agregar el formulario al cuerpo del documento y enviarlo
+    document.body.appendChild(form);
+    form.submit();
+  }
+</script>

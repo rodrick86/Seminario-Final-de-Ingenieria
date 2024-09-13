@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+{% block content %}
+<!-- Include jQuery from CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Include Select2 CSS and JS files -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
+  <h1>Crear Auto</h1>
+
+
+        <div class="col-sm-12 col-md-4 mt-3">
+            <div id="clienteInfo">
+                <h4>Información del Cliente</h4>
+                <p>Nombre: <span id="infoNombre">{{ orden_cliente_info.nombre }}</span></p>
+                <p>Apellido: <span id="infoApellido">{{ orden_cliente_info.apellido }}</span></p>
+                <p>CUIT/CUIL: <span id="infoCuit">{{ orden_cliente_info.cuit }}</span></p>
+                <p>Dirección: <span id="infoDireccion">{{ orden_cliente_info.direccion }}</span></p>
+                <p>Teléfono: <span id="infoTelefono">{{ orden_cliente_info.telefono }}</span></p>
+                <p>Email: <span id="infoEmail">{{ orden_cliente_info.email }}</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ items_formset.management_form }}
+
+    <fieldset>
+      <legend>Ítems</legend>
+      {% for form in items_formset %}
+        {{ form.as_p }}
+      {% endfor %}
+    </fieldset>
+    <input type="hidden" name="next" value="{{ request.GET.next }}">
+    <button type="submit">Guardar</button>
+  </form>
+
+
+
+
+
+<script>
+$(document).ready(function() {
+    initializeSelect2();
+
+    function initializeSelect2(element = null) {
+        if (element === null) {
+            element = $(document);
+        }
+
+        let clienteInfoContainer = $("#clienteInfo");
+        let select2Input = element.find('.js-select_cliente');
+
+        // Initialize select2
+        select2Input.select2({
+            ajax: {
+                url: '{% url "load-clientes" %}',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { term: params.term };
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error al cargar datos: ", textStatus, errorThrown);
+                },
+                minimumInputLength: 2
+            }
+        });
+
+        // Event listener for the select2:select event
+        select2Input.on('select2:select', function (e) {
+            let cliente = e.params.data;
+            clienteInfoContainer.find("#infoNombre").text(cliente.nombre);
+            clienteInfoContainer.find("#infoApellido").text(cliente.apellido);
+            clienteInfoContainer.find("#infoCuit").text(cliente.cuit);
+            clienteInfoContainer.find("#infoDireccion").text(cliente.direccion);
+            clienteInfoContainer.find("#infoTelefono").text(cliente.telefono);
+            clienteInfoContainer.find("#infoEmail").text(cliente.email);
+        });
+    }
+});
+
+
+
+ </script>
+{% endblock %}

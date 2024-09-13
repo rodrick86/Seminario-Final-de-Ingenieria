@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Órdenes Entregadas</h1>
+<form method="get" action="{% url 'ordenes_entregadas' %}">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <label for="auto">Auto:</label>
+                <select id="auto" name="auto" class="form-control select2">
+                    <option value="">Todos</option>
+                    {% for auto in autos %}
+                        <option value="{{ auto.id }}" {% if request.GET.auto == auto.id|stringformat:"s" %}selected{% endif %}>
+                            {{ auto }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="cliente">Cliente:</label>
+                <select id="cliente" name="cliente" class="form-control select2">
+                    <option value="">Todos</option>
+                    {% for cliente in clientes %}
+                        <option value="{{ cliente.id }}" {% if request.GET.cliente == cliente.id|stringformat:"s" %}selected{% endif %}>
+                            {{ cliente }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label for="fecha_inicio">Fecha de Inicio:</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control" value="{{ request.GET.fecha_inicio }}">
+            </div>
+
+            <div class="col-md-3">
+                <label for="fecha_fin">Fecha de Fin:</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control" value="{{ request.GET.fecha_fin }}">
+            </div>
+
+
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary">Buscar</button>
+                <a href="{% url 'ordenes_entregadas' %}" class="btn btn-secondary">Limpiar Filtros</a>
+            </div>
+        </div>
+    </div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Recepcionista</th>
+            <th>Técnico</th>
+            <th>Vehículo</th>
+            <th>Ingreso</th>
+            <th>Entrega</th>
+
+            <th>Estado de Orden</th>
+            <th>Presupuesto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for orden in ordenes %}
+        <tr>
+            <td>{{ orden.usuario }}</td>
+            <td>{{ orden.tecnico }}</td>
+            <td>{{ orden.auto }} ({{ orden.auto.cliente }})</td>
+            <td>{{ orden.fecha_creacion }}</td>
+            <td>{{ orden.entrega }}</td>
+
+            <td>
+                <span class="badge badge-dot">
+                    <i class="bg-success"></i> {{ orden.estado }}
+                </span>
+            </td>
+            <td>
+                {% if orden.presupuesto_set.exists %}
+                {% for presupuesto_item in orden.presupuesto_set.all %}
+                <a href="{% url 'visualizar_presupuesto' presupuesto_item.id %}" class="text-secondary mr-2" title="Ver presupuesto">
+                    <i class="feather icon-search"></i>
+                </a>
+                <span class="badge badge-warning">Presupuesto id: {{ presupuesto_item.id }}</span>
+                {% endfor %}
+                {% else %}
+                <span class="badge badge-pill badge-info">Sin Presupuesto</span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="dropdown">
+                    <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v" style="color: black;"></i>
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <a class="dropdown-item" href="{% url 'orden' orden.id %}">Visualizar</a>
+                        <a class="dropdown-item" href="{% url 'editar-orden' orden.id %}">Editar</a>
+                        <a class="dropdown-item" href="{% url 'eliminar-orden' orden.id %}">Eliminar</a>
+                        <a class="dropdown-item" href="{% url 'historial_ordenes_auto' orden.auto.id %}">Historial</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="9"><h3>No hay órdenes entregadas en esta lista</h3></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+     <a href="{% url 'index' %}" class="btn btn-secondary">&#x1F860; Volver</a>
+</table>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: 'Selecciona una opción',
+            allowClear: true
+        });
+    });
+</script>
+
+{% endblock %}

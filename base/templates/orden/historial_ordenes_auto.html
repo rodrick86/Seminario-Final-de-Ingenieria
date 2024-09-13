@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %} <!-- Asegúrate de cargar el filtro personalizado -->
+{% block content %}
+<head>
+    <meta charset="UTF-8">
+    <title>Historial de Órdenes de {{ auto.matricula }}</title>
+</head>
+<body>
+    <h1>Historial de Órdenes para el Auto: {{ auto.matricula }}</h1>
+
+    {% if ordenes %}
+    <table id="historial-ordenes" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>ID Orden</th>
+                <th>Recepcionista</th>
+                <th>Tecnico</th>
+                <th>Fecha de Creación</th>
+                <th>Fecha de Entrega</th>
+                <th>Ítems Solicitados</th> <!-- Nueva columna para los ítems solicitados -->
+                <th>Acciones</th> <!-- Columna para acciones -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in ordenes %}
+            <tr>
+                <td>{{ orden.id }}</td>
+                <td>{{orden.usuario}}</td>
+                <td>{{ orden.tecnico }}</td>
+                <td>{{ orden.fecha_creacion }}</td>
+                <td>{{ orden.entrega }}</td>
+                <td>
+                    {% if items_por_orden|dictkey:orden.id %}
+                        <ul>
+                        {% for item in items_por_orden|dictkey:orden.id %}
+                            <li>
+                                {{ item.descripcion }} - {{ item.cantidad }} - {{ item.realizado|yesno:"Realizado,Pendiente" }}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>No hay ítems solicitados para esta orden.</p>
+                    {% endif %}
+                </td>
+                <td>
+                    <a class="dropdown-item" href="{% url 'orden' orden.id %}" >Visualizar</a>
+
+
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>No hay órdenes asociadas con este auto.</p>
+    {% endif %}
+</body>
+
+<a href="{% url 'index' %}" class="btn btn-primary">&#x1F860; Volver</a>
+{% endblock %}

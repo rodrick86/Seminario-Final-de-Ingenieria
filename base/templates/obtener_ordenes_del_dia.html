@@ -1,0 +1,111 @@
+<div class="tab-content" id="myTabContent">
+    <!-- Pestaña de Hoy -->
+    <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <h2 class="mb-5">Órdenes de Hoy</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Recepcionista</th>
+                    <th>Técnico</th>
+                    <th>Vehículo</th>
+                    <th>Ingreso</th>
+                    <th>Entrega</th>
+                    <th>Items Solicitados</th>
+                    <th>Estado de Orden</th>
+                    <th>Presupuesto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes_hoy %}
+                <tr>
+                    <td>{{ orden.usuario }}</td>
+                    <td>{{ orden.tecnico }}</td>
+                    <td>{{ orden.auto }}</td>
+                    <td>{{ orden.fecha_creacion }}</td>
+                    <td>{{ orden.entrega }}</td>
+                    <td>
+                        <!-- Aquí puedes añadir el código de la barra de progreso -->
+                    </td>
+                    <td>{{ orden.estado }}</td>
+                    <td>
+                        {% if orden.presupuesto_set.exists %}
+                            {% for presupuesto_item in orden.presupuesto_set.all %}
+                                {% if presupuesto_item.estado_presupuesto == 'aprobado' %}
+                                    <span class="badge badge-warning heartbeat-animation">Presupuesto id: {{ presupuesto_item.id }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-warning">Presupuesto id: {{ presupuesto_item.id }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="badge badge-pill badge-info">Sin Presupuesto</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Opciones de menú -->
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8"><h3>No hay órdenes para hoy</h3></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pestaña de Mañana -->
+    <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <h2 class="mb-5">Órdenes de Mañana</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Recepcionista</th>
+                    <th>Técnico</th>
+                    <th>Vehículo</th>
+                    <th>Ingreso</th>
+                    <th>Entrega</th>
+                    <th>Items Solicitados</th>
+                    <th>Estado de Orden</th>
+                    <th>Presupuesto</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes_manana %}
+                <tr>
+                    <td>{{ orden.usuario }}</td>
+                    <td>{{ orden.tecnico }}</td>
+                    <td>{{ orden.auto }}</td>
+                    <td>{{ orden.fecha_creacion }}</td>
+                    <td>{{ orden.entrega }}</td>
+                    <td>
+                        <!-- Aquí puedes añadir el código de la barra de progreso -->
+                    </td>
+                    <td>{{ orden.estado }}</td>
+                    <td>
+                        {% if orden.presupuesto_set.exists %}
+                            {% for presupuesto_item in orden.presupuesto_set.all %}
+                                {% if presupuesto_item.estado_presupuesto == 'aprobado' %}
+                                    <span class="badge badge-warning heartbeat-animation">Presupuesto id: {{ presupuesto_item.id }}</span>
+                                {% else %}
+                                    <span class="badge badge-pill badge-warning">Presupuesto id: {{ presupuesto_item.id }}</span>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <span class="badge badge-pill badge-info">Sin Presupuesto</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <!-- Opciones de menú -->
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8"><h3>No hay órdenes para mañana</h3></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

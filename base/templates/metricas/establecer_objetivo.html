@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load range_tags %}
+{% load custom_filters %}
+
+{% load static %}
+
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block content %}
+    <title>Establecer Objetivo Mensual</title>
+</head>
+<body>
+    <h1>Establecer Objetivo Mensual</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Guardar Objetivo</button>
+    </form>
+    <a href="{% url 'metricas' %}">Volver a Métricas</a>
+</body>
+</html>
+{% endblock content %}

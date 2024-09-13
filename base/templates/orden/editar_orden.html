@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+{% block content %}
+<!-- Include jQuery from CDN -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<!-- Include Select2 CSS and JS files -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12 col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>EDITAR ORDEN DE REPARACIÓN</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+
+                        <!-- Mostrar el formulario principal con valores actuales -->
+                        {{ form.as_p }}
+
+                        <!-- Campo oculto para TOTAL_FORMS -->
+                        <input type="hidden" name="items-TOTAL_FORMS" id="id_form-TOTAL_FORMS" value="{{ items_formset.total_form_count }}">
+
+                        <h3>Ítems Solicitados</h3>
+                        {{ items_formset.management_form }}
+
+                        <div id="formset-container">
+                            {% for form in items_formset %}
+                                <div class="formset-row mb-3 p-3 border rounded">
+                                    {{ form.as_p }}
+                                    <button type="button" class="remove-item btn btn-danger btn-sm">Eliminar</button>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="button" id="add-item" class="btn btn-primary">Agregar Ítem</button>
+
+                        <!-- Plantilla de formulario vacío -->
+                        <div id="empty-form" style="display: none;">
+                            <div class="form-group">
+                                <label for="id_items-__prefix__-descripcion">Descripción:</label>
+                                <input type="text" name="items-__prefix__-descripcion" class="form-control" maxlength="255" id="id_items-__prefix__-descripcion">
+                            </div>
+                            <div class="form-group">
+                                <input type="hidden" name="items-__prefix__-id" id="id_items-__prefix__-id">
+                                <input type="hidden" name="items-__prefix__-orden" id="id_items-__prefix__-orden">
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <input type="submit" class="btn btn-primary" value="Actualizar Orden">
+                            <a href="{% url 'index' %}" class="btn btn-secondary">&#x1F860; Volver</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12 col-md-4 mt-3">
+            <div id="autoInfo">
+                <h4>Información del Auto</h4>
+                <p>Chasis: <span>{{orden.auto.chasis}}</span></p>
+                <p>Modelo: <span>{{orden.auto.vehiculo}}</span></p>
+                <p>Año: <span>{{orden.auto.anio}}</span></p>
+                <p>Matrícula: <span>{{orden.auto.matricula}}</span></p>
+            </div>
+            <div id="clienteInfo" class="mt-3">
+                <h4>Información del Cliente</h4>
+                <p>Titular: <span>{{orden.auto.cliente}}</span></p>
+                <p>CUIT/CUIL: <span >{{orden.auto.cliente.cuil}}</span></p>
+                <p>Dirección: <span >{{orden.auto.cliente.direccion}}</span></p>
+                <p>Teléfono: <span >{{orden.auto.cliente.telefono}}</span></p>
+                <p>Email: <span >{{orden.auto.cliente.email}}</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    function initializeSelect2() {
+        let clienteInfoContainer = $("#clienteInfo");
+        let autoInfoContainer = $("#autoInfo");
+        let select2AutoInput = $('.js-select_auto');
+
+        // Initialize select2 for autos
+        select2AutoInput.select2({
+            ajax: {
+                url: '{% url "load-auto" %}',
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return { term: params.term };
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error("Error al cargar datos: ", textStatus, errorThrown);
+                },
+                minimumInputLength: 2
+            }
+        });
+
+        // Event listener for the select2:select event for autos
+        select2AutoInput.on('select2:select', function (e) {
+            let auto = e.params.data;
+            if (auto) {
+                autoInfoContainer.find("#infoChasis").text(auto.chasis || 'No disponible');
+                autoInfoContainer.find("#infoVehiculo").text(auto.vehiculo || 'No disponible');
+                autoInfoContainer.find("#infoAno").text(auto.anio || 'No disponible');
+                autoInfoContainer.find("#infoMatricula").text(auto.matricula || 'No disponible');
+
+                clienteInfoContainer.find("#infoNombre").text(auto.cliente_nombre || 'No disponible');
+                clienteInfoContainer.find("#infoApellido").text(auto.cliente_apellido || 'No disponible');
+                clienteInfoContainer.find("#infoCuit").text(auto.cliente_cuit || 'No disponible');
+                clienteInfoContainer.find("#infoDireccion").text(auto.cliente_direccion || 'No disponible');
+                clienteInfoContainer.find("#infoTelefono").text(auto.cliente_telefono || 'No disponible');
+                clienteInfoContainer.find("#infoEmail").text(auto.cliente_email || 'No disponible');
+            }
+        });
+    }
+
+    $('#add-item').click(function() {
+        let form_idx = parseInt($('#id_form-TOTAL_FORMS').val());
+        if (isNaN(form_idx)) {
+            console.error("form_idx is NaN, check your TOTAL_FORMS field.");
+            return;
+        }
+        let new_form = $('#empty-form').html().replace(/__prefix__/g, form_idx);
+        $('#formset-container').append(
+            '<div class="formset-row mb-3 p-3 border rounded">' +
+            new_form +
+            '<button type="button" class="remove-item btn btn-danger btn-sm">Eliminar</button>' +
+            '</div>'
+        );
+        $('#id_form-TOTAL_FORMS').val(form_idx + 1);
+
+        initializeSelect2();
+    });
+
+    $('#formset-container').on('click', '.remove-item', function() {
+        $(this).closest('.formset-row').remove();
+
+        let forms = $('#formset-container .formset-row');
+        $('#id_form-TOTAL_FORMS').val(forms.length);
+
+        forms.each(function(index) {
+            $(this).find(':input').each(function() {
+                let name = $(this).attr('name');
+                if (name) {
+                    name = name.replace(/\d+/, index);
+                    $(this).attr('name', name);
+                }
+                let id = $(this).attr('id');
+                if (id) {
+                    id = id.replace(/\d+/, index);
+                    $(this).attr('id', id);
+                }
+            });
+        });
+    });
+
+    initializeSelect2();
+});
+</script>
+
+{% endblock content %}

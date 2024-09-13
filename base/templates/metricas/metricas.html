@@ -1,0 +1,394 @@
+
+{% extends 'base.html' %}
+{% load range_tags %}
+{% load custom_filters %}
+
+{% load static %}
+
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block content %}
+
+
+
+<a href="{% url 'index' %}" class="btn-back">
+  <i class="feather icon-corner-down-left"></i>
+</a>
+<div></div>
+
+
+<!-- [ Main Content ] start -->
+<div class="row">
+<div class="col-md-6 col-xl-4">
+  <div class="card daily-sales">
+    <div class="card-block">
+      <div class="d-flex justify-content-between align-items-start mb-3">
+          <h6 class="mb-4">Horas Vendidas acumuladas</h6>
+        <div class="objective-info">
+          <span class="mb-4">Objetivo Mensual</span>
+          <span class="objective-value">{{ objetivo_mensual }} hs</span>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3 class="f-w-300 d-flex align-items-center m-b-0">
+          <i class="feather icon-arrow-up text-c-green f-30 m-r-10"></i>{{ horas_acumuladas_mes_actual }} hs
+        </h3>
+        <div class="objective-text">{{ porcentaje_alcanzado }}%</div>
+      </div>
+
+      <div class="progress m-t-30" style="height: 7px;">
+        <div class="progress-bar progress-c-theme" role="progressbar" style="width: {{ porcentaje_alcanzado }}%;" aria-valuenow="{{ porcentaje_alcanzado }}" aria-valuemin="0" aria-valuemax="100"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- [ Horas Acumuladas ] end -->
+
+
+
+  <!-- [ Horas Empleadas ] start -->
+  <div class="col-md-6 col-xl-4">
+    <div class="card yearly-sales">
+      <div class="card-block">
+        <h6 class="mb-4">Horas empleadas</h6>
+        <div class="row d-flex align-items-center">
+          <div class="col-9">
+            <h3 class="f-w-300 d-flex align-items-center m-b-0">
+              <i class="feather icon-watch f-30 m-r-10 icon-gradient-green"></i>{{ tiempo_total_acumulado }}hs
+
+            </h3>
+          </div>
+          <div class="col-3 text-right">
+            <i class="feather icon-users f-40 icon-gradient-green"></i>
+          </div>
+        </div>
+        <div class="progress m-t-30" style="height: 7px;">
+          <div class="progress-bar progress-c-theme" role="progressbar" style="width: 70%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Horas Empleadas ] end -->
+
+  <!-- [ Mes Anterior ] start -->
+  <div class="col-md-6 col-xl-4">
+    <div class="card Monthly-sales">
+      <div class="card-block">
+        <h6 class="mb-4">Mes anterior</h6>
+        <div class="row d-flex align-items-center">
+          <div class="col-9">
+            <h3 class="f-w-300 d-flex align-items-center m-b-0">
+              <i class="feather icon-watch f-30 m-r-10 icon-gradient-purpure"></i>{{ horas_acumuladas_mes_anterior }}hs
+            </h3>
+          </div>
+          <div class="col-3 text-right">
+            <p class="feather icon-calendar f-40 icon-gradient-purpure"></p>
+          </div>
+        </div>
+        <div class="progress m-t-30" style="height: 7px;">
+          <div class="progress-bar progress-c-theme2" role="progressbar" style="width: 35%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- [ Mes Anterior ] end -->
+
+
+
+
+
+
+
+
+
+
+
+    <!-- [ rating list ] starts-->
+    <div class="col-xl-4 col-md-6">
+      <div class="card user-list">
+        <div class="card-header">
+          <h5>Ordenes por Tecnico</h5>
+        </div>
+        <div class="card-block">
+          <div class="row align-items-center justify-content-center m-b-20">
+            <div class="col-6">
+              <h2 class="mt-3 f-w-300">{{ cantidad_ordenes_finalizadas_mes }}  <sub class="text-muted f-14 espacio-derecha">Ordenes</sub>
+                  </h2>
+            </div>
+            <div class="col-6">
+              <h6 class="d-flex  align-items-center float-right m-0"> <i
+                  class="fas fa-caret-up text-c-green f-22 m-l-10"></i></h6>
+            </div>
+          </div>
+
+          <div class="row">
+           {% for tecnico in rating_tecnicos %}
+    <div class="col-xl-12">
+        <h6 class="align-items-center float-left">
+            <i class="fas fa-star f-10 m-r-10 text-c-yellow"></i>
+            {{ tecnico.tecnico__user__username }} ({{ tecnico.total_ordenes }})
+        </h6>
+        <h6 class="align-items-center float-right">
+            {{ tecnico.porcentaje_completado|floatformat:1 }}%
+
+        </h6>
+
+            {% for tiempo in tiempo_total_por_tecnico %}
+                {% if tiempo.tecnico__user__username == tecnico.tecnico__user__username %}
+                    {{ tiempo.tiempo_acumulado }}
+                {% endif %}
+            {% endfor %}
+
+
+
+        <div class="progress m-t-30 m-b-20" style="height: 6px;">
+            <div class="progress-bar progress-c-theme" role="progressbar"
+                style="width: {{ tecnico.porcentaje_completado|floatformat:1|stringformat:"s"|slice:":-1" }}%;"
+                aria-valuenow="{{ tecnico.porcentaje_completado|floatformat:1 }}%"
+                aria-valuemin="0" aria-valuemax="100">
+            </div>
+
+        </div>
+    </div>
+{% endfor %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- [ rating list ] end-->
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.progress-bar').forEach(function(bar) {
+            var percentage = parseFloat(bar.getAttribute('aria-valuenow')).toFixed(2);
+            bar.style.width = percentage + '%';
+        });
+    });
+</script>
+
+
+
+  <!-- [ Statistics Year Chart ] start -->
+  <div class="col-md-6 col-xl-4">
+    <div class="card card-event">
+      <div class="card-block">
+        <div class="row align-items-center justify-content-center">
+          <div class="col">
+            <h5 class="m-0"></h5>
+            <form method="GET" action="{% url 'metricas' %}" class="form-inline">
+              <div class="form-group mb-2">
+                <label for="mes" class="sr-only">Mes:</label>
+                <select name="mes" id="mes" class="form-control">
+                  {% for i in 12|to %}
+                  <option value="{{ i }}" {% if i == mes %}selected{% endif %}>{{ i }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-group mb-2 mx-sm-3">
+                <label for="año" class="sr-only">Año:</label>
+                <select name="año" id="año" class="form-control">
+                  {% for y in años %}
+                  <option value="{{ y }}" {% if y == año %}selected{% endif %}>{{ y }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary mb-2">Consultar</button>
+            </form>
+          </div>
+          <div class="col-auto">
+            <label class="label theme-bg2 text-white f-14 f-w-400 float-right">Mes a Mes</label>
+          </div>
+        </div>
+        <h2 class="mt-3 f-w-300">
+          {{ horas_acumuladas }}
+          <sub class="text-muted f-14 espacio-derecha">Horas vendidas</sub>
+          {{ tiempo_total_acumulado }}hs
+          <sub class="text-muted f-14 espacio-izquierda">Horas empleadas</sub>
+        </h2>
+        <h6 class="text-muted mt-4 mb-0">Elige un mes especifico </h6>
+      </div>
+    </div>
+  </div>
+  <!-- [ Statistics Year Chart ] end -->
+
+  <!-- [ Total Ordenes Terminadas ] start -->
+
+
+  <div class="col-md-6 col-xl-4">
+
+    <div class="card">
+      <div class="card-block border-bottom">
+        <div class="row d-flex align-items-center">
+          <div class="col-auto">
+            <i class="feather icon-thumbs-up f-40" style="color:#2effa7"></i>
+          </div>
+          <div class="col">
+            <h3 class="f-w-300"><p>{{ cantidad_ordenes_finalizadas_mes }}</p></h3>
+            <span class="d-block text-uppercase">TOTAL ORDENES TERMINAS</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-block border-bottom">
+        <div class="row d-flex align-items-center">
+          <div class="col-auto">
+            <i class="feather icon-thumbs-down f-40" style="color:red"></i>
+          </div>
+          <div class="col">
+            <h3 class="f-w-300"><p>{{ cantidad_presupuestos_rechazados_mes }}</p></h3>
+            <span class="d-block text-uppercase">PRESUPUESTOS RECHAZADOS</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-block border-bottom">
+        <div class="row d-flex align-items-center">
+          <div class="col-auto">
+            <i class="feather icon-alert-triangle f-40" style="color:#ff972e"></i>
+          </div>
+          <div class="col">
+            <h3 class="f-w-300">{{ cantidad_ordenes_frenadas_mes }}</h3>
+            <span class="d-block text-uppercase">ORDENES FRENADAS</span>
+          </div>
+        </div>
+      </div>
+
+    <div class="card-block border-bottom">
+      <div class="row d-flex align-items-center">
+        <div class="col-auto">
+          <i class="feather icon-clock f-40" style="color:#2effa7"></i>
+        </div>
+        <div class="col">
+          <h3 class="f-w-300"><p>{{cantidad_ordenes_a_tiempo}}</p></h3>
+          <span class="d-block text-uppercase">ORDENES A TIEMPO</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-block border-bottom">
+      <div class="row d-flex align-items-center">
+        <div class="col-auto">
+          <i class="feather icon-clock f-40" style="color:red"></i>
+        </div>
+        <div class="col">
+          <h3 class="f-w-300"><p>{{cantidad_ordenes_fuera_de_tiempo}}</p></h3>
+          <span class="d-block text-uppercase">ORDENES FUERA DE TIEMPO</span>
+        </div>
+      </div>
+    </div>
+
+
+    </div>
+  </div>
+
+<!-- [ Total Ordenes A Tiempo y Fuera de Tiempo ] end -->
+
+
+
+<!--[tecnicos] start-->
+{% for tecnico in rating_tecnicos %}
+
+    <div class="col-md-6 col-xl-4">
+        <div class="card card-social">
+            <div class="card-block border-bottom">
+                <div class="row align-items-center justify-content-center">
+                    <div class="col-auto">
+                        <img class="rounded-circle m-r-10" style="width:60px;" src="{% static 'assets/images/user/avatar-4.jpg' %}" alt="activity-user">
+                        {{ tecnico.tecnico__user__username }}
+                    </div>
+                    <div class="col text-right">
+                        <h3>{{ tecnico.total_ordenes }} Ordenes</h3>
+                        <h5 class="text-c-blue mb-0"> {{ tecnico.porcentaje_completado|floatformat:1 }}% <span class="text-muted"></span></h5>
+                    </div>
+                </div>
+            </div>
+            <div class="card-block">
+                <div class="row align-items-center justify-content-center card-active">
+                    <div class="col-6">
+                        <h6 class="text-center m-b-10">
+                            <span class="text-muted m-r-5">Ordenes a tiempo:</span>
+                            {{ tecnico.cantidad_a_tiempo }} ({{ tecnico.porcentaje_a_tiempo|floatformat:1 }}%)
+                        </h6>
+                        <div class="progress">
+                            <div class="progress-bar progress-c-theme" role="progressbar" style="width:{{ tecnico.porcentaje_a_tiempo|floatformat:1 }}%;height:6px;"
+                              aria-valuenow="{{ tecnico.porcentaje_a_tiempo|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <h6 class="text-center m-b-10">
+                            <span class="text-muted m-r-5">Ordenes fuera de tiempo:</span>
+                            {{ tecnico.cantidad_fuera_de_tiempo }} ({{ tecnico.porcentaje_fuera_de_tiempo|floatformat:1 }}%)
+                        </h6>
+                        <div class="progress">
+                            <div class="progress-bar progress-c-theme2" role="progressbar" style="width:{{ tecnico.porcentaje_fuera_de_tiempo|floatformat:1 }}%;height:6px;"
+                              aria-valuenow="{{ tecnico.porcentaje_fuera_de_tiempo|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% empty %}
+    <p>No hay datos disponibles.</p>
+{% endfor %}
+<!--[social-media section] end-->
+
+
+
+  </div>
+  <!-- [ Main Content ] end -->
+<style>
+  .espacio-izquierda {
+  margin-left: 20px; /* Ajusta el valor según el espacio que necesites */
+}
+
+.espacio-derecha {
+  margin-right: 20px; /* Ajusta el valor según el espacio que necesites */
+}
+
+.icon-gradient-green {
+    display: inline-block;
+    background: linear-gradient(-135deg, #1de9b6 0%, #1dc4e9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.icon-gradient-purpure {
+    display: inline-block;
+    background: linear-gradient(-135deg, #899FD4 0%, #A389D4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px; /* Ajusta el tamaño del texto */
+  color: #007bff; /* Color del texto y del icono */
+  text-decoration: none; /* Elimina el subrayado */
+  padding: 10px 15px; /* Espaciado interno */
+  border: 1px solid #007bff; /* Borde alrededor del enlace */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: background-color 0.3s, color 0.3s; /* Transición suave */
+}
+
+.btn-back:hover {
+  background-color: #007bff; /* Color de fondo al pasar el mouse */
+  color: #ffffff; /* Color del texto e icono al pasar el mouse */
+}
+
+.btn-back i {
+  margin-right: 5px; /* Espacio entre el icono y el texto */
+  font-size: 20px; /* Tamaño del icono */
+}
+
+</style>
+
+
+
+
+{% endblock content %}

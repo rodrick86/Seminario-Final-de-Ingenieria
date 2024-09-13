@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<h2>Lista de Clientes</h2>
+<div class="mb-3">
+    <form class="d-flex" method="GET" action="{% url 'lista_clientes' %}">
+        <input class="form-control me-2" type="text" name="q" placeholder="Buscar por nombre, apellido, Cuit/Cuil, teléfono, etc." value="{{ request.GET.q }}">
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+        <button class="btn btn-outline-secondary" type="button" onclick="limpiarBusqueda()">Limpiar</button>
+    </form>
+</div>
+
+<a href="{% url 'crear_cliente' %}"><img style="width:35px; top:20px" src="{% static 'assets/images/user/agregar-cliente2.png' %}"></a>
+
+<table id="example2" class="table table-striped table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Dni/Cuit/Cuil</th>
+            <th>Telefono</th>
+
+            <th>Vehiculo Asociados</th> <!-- Nueva columna para mostrar autos -->
+            <!-- ...otros campos... -->
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cliente in clientes %}
+        <tr>
+            <td>{{ cliente.nombre }}</td>
+            <td>{{ cliente.apellido }}</td>
+            <td>{{ cliente.dni }}</td>
+            <td>{{ cliente.telefono }}</td>
+
+            <td>
+                {% for auto in cliente.autos.all %}
+                    {{ auto.matricula }} ({{auto.vehiculo}})<br> <!-- Muestra la matrícula de cada auto asociado -->
+                {% empty %}
+                    Sin autos asociados
+                {% endfor %}
+            </td>
+            <!-- ...otros campos... -->
+            <td>
+                <a href="{% url 'editar_cliente' cliente.id %}"><img style="width:25px; margin-bottom: 20px;" src="{% static 'assets/images/user/editar.png' %}"></a>
+                <a href="{% url 'eliminar_cliente' cliente.id %}"><img style="width:25px; margin-bottom: 20px;" src="{% static 'assets/images/user/basura.png' %}"></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<script>
+    var typingTimer;
+    var doneTypingInterval = 500; // tiempo en milisegundos (0.5 segundos)
+
+    // función para manejar la búsqueda incremental
+    function doSearch() {
+        var query = $('#search-input').val();
+
+        // realizar una solicitud AJAX aquí con la query
+        $.ajax({
+            type: 'GET',
+            url: '{% url "lista_clientes" %}',
+            data: { 'q': query },
+            success: function(data) {
+                // actualizar la tabla con los resultados de la búsqueda
+                $('#your-table-id').html(data);
+            }
+        });
+    }
+
+    // función para limpiar la búsqueda
+    function limpiarBusqueda() {
+        $('#search-input').val('');
+        doSearch(); // realiza una búsqueda para mostrar todos los clientes nuevamente
+    }
+
+    // evento para detectar cuando el usuario termina de escribir
+    $('#search-input').on('input', function() {
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(doSearch, doneTypingInterval);
+    });
+     function limpiarBusqueda() {
+        // Redirige a la misma URL sin el parámetro de búsqueda
+        window.location.href = '{% url "lista_clientes" %}';
+    }
+</script>
+
+{% endblock %}
